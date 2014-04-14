@@ -34,3 +34,13 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# Project resources
+media/fail_sound.wav
+media/read_sound.wav
+media/sound-left.svg
+media/sound-right.svg
+media/sound-stereo.svg
+media/success_sound.wav
+media/tarrab-me-icon.png
+media/tarrabme-checker-resources.gresource

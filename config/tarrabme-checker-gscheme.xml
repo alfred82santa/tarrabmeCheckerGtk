@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>  
+  <schema id="apps.tarrabme.checker" path="/apps/tarrabme/checker">
+    <key type="s" name="baseurl">
+      <default>http://localhost:8000</default>
+      <summary>Base URL to access BE</summary>
+      <description>Base URL to access BE. Default: http://localhost:8000</description>
+    </key>
+    
+    <key type="s" name="attempt-path">
+      <default>codes/%code%/attempt</default>
+      <summary>Path to access when attempt to validate a ticket</summary>
+      <description>Path to access when attempt to validate a ticket. Use "%code%" as placeholder for code. Default: codes/%code%/attempt</description>
+    </key>
+    
+    <key type="s" name="login-path">
+      <default>users/login</default>
+      <summary>Path to login on BE</summary>
+      <description>Path to login on BE. Default: users/login</description>
+    </key>
+    
+    <key type="q" name="window-count">
+      <range min="1" />
+      <default>1</default>
+      <summary>Number of windows</summary>
+      <description>Number of windows create at beginning</description>
+    </key>
+    
+    <key type="q" name="row-count">
+      <range min="1" max="4"/>
+      <default>1</default>
+      <summary>Number of rows per window</summary>
+      <description>Number of rows per window</description>
+    </key>
+    
+    <key type="q" name="column-count">
+      <range min="1" max="4"/>
+      <default>2</default>
+      <summary>Number of columns per window</summary>
+      <description>Number of columns per window</description>
+    </key>
+  </schema>
+  
+  <schema id="apps.tarrabme.checker.checker">
+    <key type="s" name="keyboard">
+      <default></default>
+      <summary>Keyboard serial number</summary>
+      <description>Keyboard serial number</description>
+    </key>
+    
+    <key type="s" name="sound-card">
+      <default></default>
+      <summary>Sound card serial number</summary>
+      <description>Sound card serial number</description>
+    </key>
+    
+    <key type="s" name="sound-card-channel">
+      <choices>
+        <choice value='left'/>
+        <choice value='center'/>
+        <choice value='right'/>
+      </choices>
+      <default>center</default>
+      <summary>Sound card channel</summary>
+      <description>Sound card channel</description>
+    </key>
+    
+    <key type="d" name="volume-general">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>General volume</summary>
+      <description>General volume</description>
+    </key>
+    
+    <key type="d" name="volume-read">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Volume for read sound</summary>
+      <description>Volume for read sound</description>
+    </key>
+    
+    <key type="d" name="volume-success">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Volume for success sound</summary>
+      <description>Volume for success sound</description>
+    </key>
+    
+    <key type="d" name="volume-fail">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Volume for fail sound</summary>
+      <description>Volume for fail sound</description>
+    </key>  
+  </schema>
+</schemalist>

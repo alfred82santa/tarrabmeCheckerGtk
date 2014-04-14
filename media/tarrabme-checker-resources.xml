@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+  <gresource prefix="/org/me/tarrab/Checker">
+    <file compressed="true">tarrab-me-icon.png</file>
+    <file compressed="true">fail_sound.wav</file>
+    <file compressed="true">read_sound.wav</file>
+    <file compressed="true">success_sound.wav</file>
+    <file compressed="true" preprocess="xml-stripblanks">sound-left.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">sound-stereo.svg</file>
+    <file compressed="true" preprocess="xml-stripblanks">sound-right.svg</file>
+  </gresource>
+</gresources>
