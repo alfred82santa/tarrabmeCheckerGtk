@@ -48,3 +48,4 @@ media/tarrabme-checker-resources.gresource
 *~
 
 config/gschemas.compiled
+.idea/*
