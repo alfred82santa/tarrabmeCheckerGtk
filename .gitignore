@@ -44,3 +44,7 @@ media/sound-stereo.svg
 media/success_sound.wav
 media/tarrab-me-icon.png
 media/tarrabme-checker-resources.gresource
+
+*~
+
+config/gschemas.compiled

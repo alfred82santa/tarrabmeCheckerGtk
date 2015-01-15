@@ -1,5 +1,6 @@
 from gi.repository import Gdk
 
+
 def get_device_by_id(device_id):
         if device_id is None:
             return None
