@@ -1,0 +1,15 @@
+.reader-frame {
+    background-color: @theme_bg_color;
+}
+
+.success {
+    background-color: #79FF79;
+}
+
+.fail {
+    background-color: #FF5151;
+}
+
+.attempt-item {
+    border-bottom: solid @theme_bg_color 1px;
+}
