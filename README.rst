@@ -24,7 +24,7 @@ It must be execute in a Gnome 3.12 environment.
 PulseAudio Config
 -----------------
 
-Tarrab.me Checker Gtk needs pulseaudio acces via dbus. So you must add below line to ``/etc/pulse/default.pa`` file
+Tarrab.me Checker Gtk needs pulseaudio access via dbus. So you must add below line to ``/etc/pulse/default.pa`` file
 and reboot pulseaudio.
 
 .. code-block::
