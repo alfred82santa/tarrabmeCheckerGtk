@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <enum id="apps.tarrabme.checker.methods">
+        <value nick="GET" value="0"/>
+        <value nick="POST" value="1"/>
+        <value nick="PUT" value="2"/>
+        <value nick="DELETE" value="3"/>
+    </enum>
+
+  <schema id="apps.tarrabme.checker" path="/apps/tarrabme/checker/">
+    <key name="baseurl" type="s">
+      <default>"http://localhost:8000"</default>
+      <summary>Base URL to access server</summary>
+      <description>
+          Base URL to access server. Default: http://localhost:8000
+      </description>
+    </key>
+
+    <key type="s" name="attempt-path">
+      <default>"/rest/codes/{code}/attempts/"</default>
+      <summary>Path to access when attempt to validate a ticket</summary>
+      <description>
+          Path to access when attempt to validate a ticket. Use "{code}" as placeholder for code. Default:
+          /rest/codes/{code}/attempts/
+      </description>
+    </key>
+
+      <key enum="apps.tarrabme.checker.methods" name="attempt-method">
+          <default>"POST"</default>
+          <summary>HTTP verb used for attempts</summary>
+          <description>HTTP verb used for attempts</description>
+      </key>
+
+      <key type="s" name="attempt-list-path">
+          <default>"/rest/codes/{code}/attempts/"</default>
+          <summary>Path to access when attempt to validate a ticket</summary>
+          <description>
+              Path to access when attempt to validate a ticket. Use "{code}" as placeholder for code. Default:
+              /rest/codes/{code}/attempts/
+          </description>
+      </key>
+
+      <key enum="apps.tarrabme.checker.methods" name="attempt-list-method">
+          <default>"GET"</default>
+          <summary>HTTP verb used to get attempt list</summary>
+          <description>HTTP verb used to get attempt list</description>
+      </key>
+
+    <key type="s" name="login-path">
+      <default>"/rest/accounts/login"</default>
+      <summary>Path to login on server</summary>
+      <description>Path to login on server. Default: /rest/accounts/login</description>
+    </key>
+
+      <key enum="apps.tarrabme.checker.methods" name="login-method">
+          <default>"POST"</default>
+          <summary>HTTP verb used to log in</summary>
+          <description>HTTP verb used to log in</description>
+      </key>
+
+      <key type="s" name="logout-path">
+          <default>"/rest/accounts/logout"</default>
+          <summary>Path to logout on server</summary>
+          <description>Path to login on server. Default: /rest/accounts/logout</description>
+      </key>
+
+      <key enum="apps.tarrabme.checker.methods" name="logout-method">
+          <default>"DELETE"</default>
+          <summary>HTTP verb used to log out</summary>
+          <description>HTTP verb used to log out</description>
+      </key>
+
+      <key type="s" name="account-path">
+          <default>"/rest/accounts/me"</default>
+          <summary>Path to access to account data</summary>
+          <description>
+              Path to access to account data. Default:
+              /rest/accounts/me
+          </description>
+      </key>
+
+    <key type="i" name="window-count">
+      <range min="1" />
+      <default>1</default>
+      <summary>Number of windows</summary>
+      <description>Number of windows create at beginning</description>
+    </key>
+
+    <key type="i" name="row-count">
+      <range min="1" max="4"/>
+      <default>1</default>
+      <summary>Number of rows per window</summary>
+      <description>Number of rows per window</description>
+    </key>
+
+    <key type="i" name="column-count">
+      <range min="1" max="4"/>
+      <default>2</default>
+      <summary>Number of columns per window</summary>
+      <description>Number of columns per window</description>
+    </key>
+  </schema>
+
+    <enum id="apps.tarrabme.checker.checker.channel">
+        <value nick="left" value="0"/>
+        <value nick="center" value="1"/>
+        <value nick="right" value="2"/>
+    </enum>
+  <schema id="apps.tarrabme.checker.checker">
+    <key type="s" name="keyboard">
+      <default>"-1"</default>
+      <summary>Keyboard device</summary>
+      <description>Keyboard device</description>
+    </key>
+
+    <key type="s" name="sound-card">
+      <default>"-1"</default>
+      <summary>Sound card device</summary>
+      <description>Sound card device</description>
+    </key>
+
+    <key enum="apps.tarrabme.checker.checker.channel" name="sound-card-channel">
+      <default>"center"</default>
+      <summary>Sound card channel</summary>
+      <description>Sound card channel</description>
+    </key>
+
+    <key type="d" name="volume-general">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>General volume</summary>
+      <description>General volume</description>
+    </key>
+
+    <key type="d" name="volume-read">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Volume for read sound</summary>
+      <description>Volume for read sound</description>
+    </key>
+
+    <key type="d" name="volume-success">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Volume for success sound</summary>
+      <description>Volume for success sound</description>
+    </key>
+
+    <key type="d" name="volume-fail">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Volume for fail sound</summary>
+      <description>Volume for fail sound</description>
+    </key>
+
+    <key type="d" name="delay">
+      <range min="0" max="10"/>
+      <default>1</default>
+      <summary>Delay between scans</summary>
+      <description>Delay between scans</description>
+    </key>
+
+    <key type="s" name="camera">
+        <default>"-1"</default>
+        <summary>Camera device</summary>
+        <description>Camera device</description>
+    </key>
+  </schema>
+</schemalist>
