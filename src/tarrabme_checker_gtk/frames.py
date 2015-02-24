@@ -543,7 +543,7 @@ class ResultFrame(BaseChildFrame):
 
     def apply_data(self, data):
         ticket_code = data.get('ticket_code', {})
-        value = ticket_code.get('ticket_pack', {}).get('code', '')
+        value = ticket_code.get('code', '')
         self.set_value_label(value, self.code_label)
 
         value = ticket_code.get('ticket_pack', {}).get('event', {}).get('name', '')
@@ -645,8 +645,7 @@ class ScanReadyFrame(BaseChildFrame):
         self.sensor = None
 
         self.add(self.reader.builder.get_object('ScanReadyView'))
-        self.slave_widget = self.reader  # .builder.get_object('entry1')
-        self.slave_widget.connect_after('realize', self.reader_realize_cb)
+        self.reader.connect_after('realize', self.reader_realize_cb)
         self.reader.controller.connect('change-step', self.change_step_cb)
 
     def reader_realize_cb(self, *args):

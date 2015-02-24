@@ -128,7 +128,6 @@ class KeyboardSensor(BaseSensor):
             self.consolidate_char()
 
         if ord(char) == 13:
-            print('event send')
             self.emit('scan-code', self.buffer)
             self.reset_buffer()
         else:

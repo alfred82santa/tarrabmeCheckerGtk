@@ -123,14 +123,10 @@ class TarrabmeCheckerApp(Gtk.Application):
                     if row == 0:
                         reader.remove(reader.toolbar)
                         box.pack_start(reader.toolbar, True, True, 0)
-                        box.get_style_context().add_class('header-reader')
-                        box.get_style_context().add_class('header-reader-row-first')
                         if column == 0:
-                            box.get_style_context().add_class('header-reader-column-first')
+                            box.get_style_context().add_class('header-reader-first')
                         if column == column_count - 1:
-                            box.get_style_context().add_class('header-reader-column-last')
-                    else:
-                        reader.toolbar.get_style_context().add_class('header-bar')
+                            box.get_style_context().add_class('header-reader-last')
 
             window.add(grid)
             window.show_all()

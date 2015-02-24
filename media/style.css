@@ -23,3 +23,8 @@
     border-bottom: solid darker(@theme_bg_color) 1px;
     border-top: solid lighter(@theme_bg_color) 1px;
 }
+
+.header-bar.header-reader {
+    border-bottom: none;
+    background: none;
+}

@@ -383,6 +383,10 @@
         <property name="position">3</property>
       </packing>
     </child>
+    <style>
+      <class name="header-bar"/>
+      <class name="header-reader"/>
+    </style>
   </object>
   <object class="GtkBox" id="ResultView">
     <property name="visible">True</property>
