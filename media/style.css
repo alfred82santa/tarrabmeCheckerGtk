@@ -13,3 +13,13 @@
 .attempt-item {
     border-bottom: solid @theme_bg_color 1px;
 }
+
+.reader {
+    border-left: solid darker(@theme_bg_color) 1px;
+    border-right: solid lighter(@theme_bg_color) 1px;
+}
+
+.last-code-frame {
+    border-bottom: solid darker(@theme_bg_color) 1px;
+    border-top: solid lighter(@theme_bg_color) 1px;
+}

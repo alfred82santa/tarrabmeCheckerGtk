@@ -68,6 +68,10 @@ class TarrabmeCheckerApp(Gtk.Application):
 
         self.set_app_menu(app_menu)
 
+        row_count = self.settings.get_int("row-count")
+        column_count = self.settings.get_int("column-count")
+
+        index = 0
         for win in range(self.settings.get_int("window-count")):
             window = Gtk.ApplicationWindow(self, type=Gtk.WindowType.TOPLEVEL)
             window.set_icon(icon)
@@ -86,28 +90,47 @@ class TarrabmeCheckerApp(Gtk.Application):
             self.add_window(window)
 
             grid = Gtk.Grid()
+            grid.get_style_context().add_class('reader-grid')
             grid.set_row_homogeneous(True)
             grid.set_column_homogeneous(True)
 
-            for row in range(self.settings.get_int("row-count")):
+            for row in range(row_count):
                 grid.insert_row(0)
-            for column in range(self.settings.get_int("column-count")):
+            for column in range(column_count):
                 grid.insert_column(0)
 
-            row_count = self.settings.get_int("row-count")
-            column_count = self.settings.get_int("column-count")
-            index = 0
             for row in range(row_count):
                 for column in range(column_count):
                     index += 1
                     reader = Reader(window, self, "reader_" + str(index),
                                     label="Reader " + str(index))
 
+                    reader.get_style_context().add_class('reader')
+
+                    reader.get_style_context().add_class('reader-row-{}'.format(row))
+                    if row == 0:
+                        reader.get_style_context().add_class('reader-row-first')
+                    if row == row_count - 1:
+                        reader.get_style_context().add_class('reader-row-last')
+                    reader.get_style_context().add_class('reader-column-{}'.format(column))
+                    if column == 0:
+                        reader.get_style_context().add_class('reader-column-first')
+                    if column == column_count - 1:
+                        reader.get_style_context().add_class('reader-column-last')
+
                     grid.attach(reader, column, row, 1, 1)
 
                     if row == 0:
                         reader.remove(reader.toolbar)
-                        box.pack_start(reader.toolbar, True, True, 10)
+                        box.pack_start(reader.toolbar, True, True, 0)
+                        box.get_style_context().add_class('header-reader')
+                        box.get_style_context().add_class('header-reader-row-first')
+                        if column == 0:
+                            box.get_style_context().add_class('header-reader-column-first')
+                        if column == column_count - 1:
+                            box.get_style_context().add_class('header-reader-column-last')
+                    else:
+                        reader.toolbar.get_style_context().add_class('header-bar')
 
             window.add(grid)
             window.show_all()

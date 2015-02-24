@@ -117,5 +117,3 @@ class SoundActuator(BaseActuator):
             self._balance.set_property("panorama", 0)
         elif channel == self.CHANNEL_RIGHT:
             self._balance.set_property("panorama", 1)
-
-

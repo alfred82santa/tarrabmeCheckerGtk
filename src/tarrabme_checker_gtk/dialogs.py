@@ -8,9 +8,11 @@ class PreferencesDialog(Gtk.Dialog):
     def __init__(self, settings):
         Gtk.Dialog.__init__(self, "Preferences", None,
                             Gtk.DialogFlags.USE_HEADER_BAR | Gtk.DialogFlags.MODAL,
-                            (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
-                             Gtk.STOCK_OK, Gtk.ResponseType.OK), use_header_bar=True)
+                            [], use_header_bar=True)
 
+        self.add_button(Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL)
+        button = self.add_button(Gtk.STOCK_OK, Gtk.ResponseType.OK)
+        button.get_style_context().add_class('suggested-action')
         self.settings = settings
         self.set_default_size(490, 350)
 
