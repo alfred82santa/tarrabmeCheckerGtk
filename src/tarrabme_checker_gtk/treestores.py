@@ -1,6 +1,7 @@
 __author__ = 'alfred'
 from gi.repository import Gtk, Gdk, Gio, GLib, GUdev
 
+
 class NoDeviceError(Exception):
     pass
 
@@ -88,23 +89,23 @@ class KeyboardTreeStore(BaseTreeStore):
 
     def on_device_added(self, device_manager, device):
         if device.get_source() == Gdk.InputSource.KEYBOARD and \
-                        device.get_device_type() in [Gdk.DeviceType.FLOATING,
-                                                     Gdk.DeviceType.SLAVE]:
+            device.get_device_type() in [Gdk.DeviceType.FLOATING,
+                                         Gdk.DeviceType.SLAVE]:
             self.add_device(device)
 
     def on_device_changed(self, device_manager, device):
         dev_item = self[str(device.props.device_id)]
         if dev_item:
             if device.get_source() == Gdk.InputSource.KEYBOARD and \
-                            device.get_device_type() in [Gdk.DeviceType.FLOATING,
-                                                         Gdk.DeviceType.SLAVE]:
+                device.get_device_type() in [Gdk.DeviceType.FLOATING,
+                                             Gdk.DeviceType.SLAVE]:
                 dev_item[self.COLUMN_LABEL] = device.get_name()
                 dev_item[self.COLUMN_FLOATING] = device.get_device_type() == Gdk.DeviceType.FLOATING
             else:
                 self.remove_device(device)
         elif device.get_source() == Gdk.InputSource.KEYBOARD and \
-                        device.get_device_type() in [Gdk.DeviceType.FLOATING,
-                                                     Gdk.DeviceType.SLAVE]:
+            device.get_device_type() in [Gdk.DeviceType.FLOATING,
+                                         Gdk.DeviceType.SLAVE]:
             self.add_device(device)
 
     def on_device_removed(self, device_manager, device):
@@ -272,4 +273,3 @@ class CameraTreeStore(UdevTreeStore):
 
 
 camera_store = CameraTreeStore()
-

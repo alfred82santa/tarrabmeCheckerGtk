@@ -289,6 +289,7 @@ class TarrabmeController(GObject.GObject):
     def cancel_operations(self):
         self.cancellable.cancel()
         self.cancellable = Gio.Cancellable()
+        self._last_message = None
         self.check_login()
 
 

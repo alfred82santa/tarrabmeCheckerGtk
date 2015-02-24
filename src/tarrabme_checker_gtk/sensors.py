@@ -1,5 +1,5 @@
 from .treestores import keyboard_store, KeyboardTreeStore, camera_store, CameraTreeStore, NoDeviceError
-from gi.repository import Gst, Gio, GdkX11, GstVideo, Clutter, GLib, GObject, Gdk
+from gi.repository import Gst, GLib, GObject, Gdk
 
 __author__ = 'alfred'
 
@@ -9,7 +9,9 @@ class BaseSensor(GObject.GObject):
         'scan-code': (GObject.SIGNAL_RUN_FIRST, None,
                       (str,)),
         'error': (GObject.SIGNAL_RUN_FIRST, None,
-                  (str,))
+                  (str,)),
+        'start-scan': (GObject.SIGNAL_RUN_FIRST, None,
+                       tuple())
     }
 
     def __init__(self, settings):
@@ -40,12 +42,13 @@ class KeyboardSensor(BaseSensor):
         self.device_id = None
         self.next_char = ''
         self.buffer = ''
+        self.grabbed = False
         self.setting.connect('changed::' + self.SETTING_NAME,
                              self.change_device_cb)
 
-        self.change_device_cb()
         self.widget.connect("key-press-event", self.keypress_event_cb)
         self.widget.connect("key-release-event", self.keyrelease_event_cb)
+        self.change_device_cb()
 
     def change_device_cb(self, *args):
         if self.device_id is not None:
@@ -54,6 +57,7 @@ class KeyboardSensor(BaseSensor):
                 if dev is not None:
                     print("Ungrab dev: {}".format(self.device_id))
                     dev.ungrab(Gdk.CURRENT_TIME)
+                    self.grabbed = False
             except NoDeviceError:
                 pass
 
@@ -74,18 +78,26 @@ class KeyboardSensor(BaseSensor):
         except NoDeviceError:
             return
 
-        if not dev:
+        if not dev or not self.widget.get_window() or self.grabbed:
             return
 
         self.widget.get_window().set_support_multidevice(True)
-        self.widget.get_window().set_device_events(dev, Gdk.EventMask.ALL_EVENTS_MASK)
-        dev.grab(self.widget.get_window(),
-                 Gdk.GrabOwnership.NONE,
-                 False,
-                 Gdk.EventMask.ALL_EVENTS_MASK,
-                 None,
-                 Gdk.CURRENT_TIME)
-        dev.set_mode(Gdk.InputMode.WINDOW)
+        self.widget.get_window().set_device_events(dev,
+                                                   Gdk.EventMask.ALL_EVENTS_MASK)
+
+        result = dev.grab(self.widget.get_window(),
+                          Gdk.GrabOwnership.NONE,
+                          False,
+                          Gdk.EventMask.ALL_EVENTS_MASK,
+                          None,
+                          Gdk.CURRENT_TIME)
+        if result == Gdk.GrabStatus.SUCCESS:
+            self.grabbed = True
+            dev.set_mode(Gdk.InputMode.WINDOW)
+            print("Grab dev: {}".format(self.device_id))
+        else:
+            print(result)
+
         self.reset_buffer()
 
     def check_event(self, event):
@@ -101,7 +113,6 @@ class KeyboardSensor(BaseSensor):
     def keypress_event_cb(self, widget, event):
         if not self.check_event(event):
             return
-
         if not self._active or len(event.string) < 1:
             self.widget.stop_emission('key-press-event')
             return True
@@ -135,6 +146,7 @@ class KeyboardSensor(BaseSensor):
 
     def reset_buffer(self):
         self.buffer = ''
+        self.emit('start-scan')
 
 
 class CameraSensor(BaseSensor):
@@ -142,7 +154,6 @@ class CameraSensor(BaseSensor):
 
     def __init__(self, settings, texture):
         BaseSensor.__init__(self, settings)
-
 
         self.timeout_handler = None
         self.texture = texture
@@ -224,6 +235,7 @@ class CameraSensor(BaseSensor):
         self.pipe.set_state(Gst.State.NULL)
         if self._src.get_property('device'):
             self.pipe.set_state(Gst.State.PLAYING)
+            self.emit('start-scan')
         else:
             self.emit('error', 'No device selected')
 
@@ -260,5 +272,3 @@ class CameraSensor(BaseSensor):
 
     def __del__(self):
         self.stop()
-
-

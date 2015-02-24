@@ -17,7 +17,7 @@
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 import json
 
-from gi.repository import WebKit, Gtk, Gdk, Soup, Pango, Gio, GLib, GtkClutter, Clutter
+from gi.repository import Gtk, Soup, Pango, Gio, GtkClutter, Clutter
 from .sensors import CameraSensor, KeyboardSensor
 from .actuators import BaseActuator, SoundActuator
 from .controllers import TarrabmeController, RecentAttemptsController, AutoScanController
@@ -71,23 +71,20 @@ class Reader(Gtk.Box):
         self.stack.set_transition_type(Gtk.StackTransitionType.OVER_LEFT)
         self.stack.set_transition_duration(300)
 
-        self.stack.add_named(SetupFrame(self), 'setup')
-        self.stack.add_named(LoginFrame(self), 'login')
-        self.stack.add_named(WaitingFrame(self), 'waiting')
-        self.stack.add_named(ScanReadyFrame(self), 'scan_ready')
-        self.stack.add_named(ResultFrame(self), 'result')
-
-        self.camera_frame = CameraFrame(self)
-        self.stack.add_named(self.camera_frame, 'camera')
-
         self.login_button = self.builder.get_object('login_button')
         self.login_button.connect("clicked", self.clicked_login_cb)
+
+        self.logout_button = self.builder.get_object('logout_button')
+        self.logout_button.connect("clicked", self.clicked_logout_cb)
 
         self.setup_button = self.builder.get_object('setup_button')
         self.setup_button.connect("clicked", self.clicked_setup_cb)
 
         self.camera_button = self.builder.get_object('cam_button')
         self.camera_button.connect("clicked", self.clicked_camera_cb)
+
+        self.scan_button = self.builder.get_object('scan_button')
+        self.scan_button.connect("clicked", self.clicked_scan_cb)
 
         self.last_code = self.builder.get_object('LastCodeView')
         self.pack_start(self.last_code, False, False, 0)
@@ -96,6 +93,14 @@ class Reader(Gtk.Box):
         self.autoscan_controller = AutoScanController(self)
 
         self.add_actuator('sound', SoundActuator(self.settings))
+
+        self.stack.add_named(SetupFrame(self), 'setup')
+        self.stack.add_named(LoginFrame(self), 'login')
+        self.stack.add_named(WaitingFrame(self), 'waiting')
+        self.stack.add_named(ScanReadyFrame(self), 'scan_ready')
+        self.stack.add_named(ResultFrame(self), 'result')
+        self.camera_frame = CameraFrame(self)
+        self.stack.add_named(self.camera_frame, 'camera')
 
         self.settings.connect('changed::keyboard', self.changed_keyboard_cb)
         self.changed_keyboard_cb()
@@ -108,9 +113,14 @@ class Reader(Gtk.Box):
 
     def show_cb(self, *args):
         self.changed_keyboard_cb()
+        self.stack.set_visible_child_name('waiting')
+        self.stack.set_visible_child_name('setup')
 
     def clicked_login_cb(self, button):
         self.controller.set_step(TarrabmeController.STEP_LOGIN)
+
+    def clicked_logout_cb(self, button):
+        self.controller.logout()
 
     def clicked_setup_cb(self, button):
         self.controller.set_step(TarrabmeController.STEP_NOP)
@@ -121,6 +131,11 @@ class Reader(Gtk.Box):
             self.stack.set_visible_child_name('camera')
             if self.camera_frame.sensor:
                 self.camera_frame.sensor.restart()
+
+    def clicked_scan_cb(self, button):
+        if self.controller.step == TarrabmeController.STEP_SCAN or \
+                self.controller.set_step(TarrabmeController.STEP_SCAN):
+            self.stack.set_visible_child_name('scan_ready')
 
     def leaving_step_cb(self, controller, step, next_step):
         if step == TarrabmeController.STEP_CHECK_LOGIN and next_step == TarrabmeController.STEP_SCAN:
@@ -227,6 +242,11 @@ class VideoFrameMixin:
         self.drawingarea.hide()
         self.image.show()
 
+    def start_scan_cb(self, sensor):
+        self.label.set_label('')
+        self.drawingarea.show()
+        self.image.hide()
+
     def realize_cb(self, *args):
         self.sensor = CameraSensor(self.reader.settings, self.texture)
         self.sensor.restart()
@@ -263,6 +283,7 @@ class VideoFrameMixin:
 
 
 class SetupFrame(BaseChildFrame):
+
     def __init__(self, *args, **kwargs):
         super(SetupFrame, self).__init__(*args, **kwargs)
 
@@ -361,7 +382,7 @@ class SetupFrame(BaseChildFrame):
                 sensor = self.reader.get_sensor('keyboard')
                 sensor.grab_device()
                 if not self.scan_code_keyboard_event_handler:
-                    self.scan_code_keyboard_event_handler = sensor.connect('scan_code',
+                    self.scan_code_keyboard_event_handler = sensor.connect('scan-code',
                                                                            self.scan_code_keyboard_cb)
             except KeyError:
                 pass
@@ -429,20 +450,27 @@ class LoginFrame(BaseChildFrame):
 
 
 class WaitingFrame(BaseChildFrame):
+
     def __init__(self, *args, **kwargs):
         super(WaitingFrame, self).__init__(*args, **kwargs)
 
         self.add(self.reader.builder.get_object('WaitingView'))
         self.label = self.reader.builder.get_object('waitng_code_label')
+        self.button = self.reader.builder.get_object('scan_cancel_button')
 
         self.reader.controller.connect('change-step', self.change_step_cb)
+        self.button.connect('clicked', self.button_clicked_cb)
 
     def change_step_cb(self, controller, step):
         if step == TarrabmeController.STEP_REQUEST:
             self.label.set_label(controller.code)
 
+    def button_clicked_cb(self, *args):
+        self.reader.controller.cancel_operations()
+
 
 class ResultFrame(BaseChildFrame):
+
     def __init__(self, *args, **kwargs):
         super(ResultFrame, self).__init__(*args, **kwargs)
 
@@ -610,6 +638,7 @@ class ResultFrame(BaseChildFrame):
 
 
 class ScanReadyFrame(BaseChildFrame):
+
     def __init__(self, *args, **kwargs):
         super(ScanReadyFrame, self).__init__(*args, **kwargs)
 
@@ -620,7 +649,7 @@ class ScanReadyFrame(BaseChildFrame):
         self.reader.controller.connect('change-step', self.change_step_cb)
 
     def reader_realize_cb(self, *args):
-        self.sensor = KeyboardSensor(self.reader.settings, self.reader)
+        self.sensor = KeyboardSensor(self.reader.settings, self.get_toplevel())
         self.reader.add_sensor('keyboard', self.sensor)
 
     def change_step_cb(self, controller, step):
@@ -629,12 +658,14 @@ class ScanReadyFrame(BaseChildFrame):
 
 
 class CameraTestFrame(BaseChildFrame, VideoFrameMixin):
+
     def __init__(self, *args, **kwargs):
         BaseChildFrame.__init__(self, *args, **kwargs)
         VideoFrameMixin.__init__(self)
 
 
 class CameraFrame(CameraTestFrame):
+
     def __init__(self, *args, **kwargs):
         CameraTestFrame.__init__(self, *args, **kwargs)
         self.sensor = None
@@ -643,8 +674,9 @@ class CameraFrame(CameraTestFrame):
     def realize_cb(self, *args):
         super(CameraFrame, self).realize_cb(*args)
         self.reader.add_sensor('camera', self.sensor)
-        self.sensor.connect('scan_code', self.scan_code_cb)
+        self.sensor.connect('scan-code', self.scan_code_cb)
         self.sensor.connect('error', self.error_cb)
+        self.sensor.connect('start-scan', self.start_scan_cb)
 
     def leaving_step_cb(self, controller, step, next_step):
         if step == TarrabmeController.STEP_SCAN and self.sensor:
