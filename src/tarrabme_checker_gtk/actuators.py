@@ -1,6 +1,8 @@
-__author__ = 'alfred'
+import json
 import re
-from gi.repository import Gst, GObject, Gio
+from gi.repository import Gst, GObject, Gio, Soup
+
+__author__ = 'alfred'
 
 
 class BaseActuator(GObject.GObject):
@@ -117,3 +119,42 @@ class SoundActuator(BaseActuator):
             self._balance.set_property("panorama", 0)
         elif channel == self.CHANNEL_RIGHT:
             self._balance.set_property("panorama", 1)
+
+
+class NeoPixelsActuator(BaseActuator):
+
+    SECTOR_SETTING_NAME = 'sector'
+    ENDPOINT_SETTING_NAME = 'neopixels-endpoint'
+
+    READ_STATUS = 'read'
+    SUCCESS_STATUS = 'success'
+    ERROR_STATUS = 'error'
+    NOOP_STATUS = 'noop'
+
+    def __init__(self, settings, app_settings):
+        BaseActuator.__init__(self, settings)
+        self.session = Soup.Session()
+        self.app_settings = app_settings
+
+    def map_action_to_status(self, action_type):
+        return action_type
+
+    def action(self, action_type):
+        self.send_status(self.map_action_to_status(action_type))
+
+    def send_status(self, status):
+        sector = self.settings.get_string(self.SECTOR_SETTING_NAME)
+        if not sector:
+            return
+
+        data = {'sector': sector,
+                'status': status}
+
+        endpoint = self.app_settings.get_string(self.ENDPOINT_SETTING_NAME)
+
+        message = Soup.Message.new('POST', endpoint)
+        message.set_request("application/json",
+                            Soup.MemoryUse.COPY,
+                            json.dumps(data).encode('UTF-8'))
+
+        self.session.queue_message(message)
