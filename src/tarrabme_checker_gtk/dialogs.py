@@ -1,4 +1,5 @@
 from gi.repository import Gtk, Gio
+from .actuators import NeoPixelsActuator
 
 __author__ = 'alfred'
 
@@ -61,6 +62,10 @@ class PreferencesDialog(Gtk.Dialog):
 
         adjustment = self.builder.get_object('rows_adjustment')
         self.settings.bind('row-count', adjustment, 'value', Gio.SettingsBindFlags.DEFAULT)
+
+        entry = self.builder.get_object('neopixels_endpoint')
+        self.settings.bind(NeoPixelsActuator.ENDPOINT_SETTING_NAME, entry,
+                           'text', Gio.SettingsBindFlags.DEFAULT)
 
         self.get_content_area().pack_start(scrolled_window, True, True, 0)
         self.show_all()

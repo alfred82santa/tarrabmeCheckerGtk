@@ -18,8 +18,9 @@
 import json
 
 from gi.repository import Gtk, Soup, Pango, Gio, GtkClutter, Clutter
+from functools import partial
 from .sensors import CameraSensor, KeyboardSensor
-from .actuators import BaseActuator, SoundActuator
+from .actuators import BaseActuator, SoundActuator, NeoPixelsActuator
 from .controllers import TarrabmeController, RecentAttemptsController, AutoScanController
 from .utils import get_datetime_label
 from .treestores import keyboard_store, audio_store, camera_store, KeyboardTreeStore, AudioDeviceTreeStore, \
@@ -93,6 +94,7 @@ class Reader(Gtk.Box):
         self.autoscan_controller = AutoScanController(self)
 
         self.add_actuator('sound', SoundActuator(self.settings))
+        self.add_actuator('leds', NeoPixelsActuator(self.settings, self.app.settings))
 
         self.stack.add_named(SetupFrame(self), 'setup')
         self.stack.add_named(LoginFrame(self), 'login')
@@ -183,6 +185,9 @@ class Reader(Gtk.Box):
 
     def add_actuator(self, name, actuator):
         self.actuators[name] = actuator
+
+    def get_actuator(self, name):
+        return self.actuators[name]
 
     def send_action(self, action):
         for actuator in self.actuators.values():
@@ -371,6 +376,24 @@ class SetupFrame(BaseChildFrame):
         button = self.reader.builder.get_object('camera_test_button')
         button.connect('clicked', self.camera_test_click_cb)
 
+        entry = self.reader.builder.get_object('sector_name_entry')
+        self.reader.settings.bind('sector', entry, 'text', Gio.SettingsBindFlags.DEFAULT)
+        button = self.reader.builder.get_object('led_success_test_button')
+        button.connect('clicked', partial(self.leds_test_click_cb,
+                                          status=NeoPixelsActuator.SUCCESS_STATUS))
+
+        button = self.reader.builder.get_object('led_error_test_button')
+        button.connect('clicked', partial(self.leds_test_click_cb,
+                                          status=NeoPixelsActuator.ERROR_STATUS))
+
+        button = self.reader.builder.get_object('led_read_test_button')
+        button.connect('clicked', partial(self.leds_test_click_cb,
+                                          status=NeoPixelsActuator.READ_STATUS))
+
+        button = self.reader.builder.get_object('led_noop_test_button')
+        button.connect('clicked', partial(self.leds_test_click_cb,
+                                          status=NeoPixelsActuator.NOOP_STATUS))
+
         # self.reader.controller.connect('leaving-step', self.leaving_step_cb)
         self.reader.controller.connect('change-step', self.change_step_cb)
 
@@ -403,6 +426,10 @@ class SetupFrame(BaseChildFrame):
         dialog.run()
         camera_frame_test.sensor.stop()
         dialog.destroy()
+
+    def leds_test_click_cb(self, button, status, *args, **kwargs):
+        actuator = self.reader.get_actuator('leds')
+        actuator.send_status(status)
 
 
 class LoginFrame(BaseChildFrame):
