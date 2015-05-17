@@ -546,7 +546,7 @@ class ResultFrame(BaseChildFrame):
         else:
             self.view.get_style_context().remove_class('success')
             self.view.get_style_context().add_class('fail')
-            self.image_result.set_from_icon_name('gtk-dialog-error', Gtk.IconSize.DIALOG)
+            self.image_result.set_from_icon_name('dialog-error', Gtk.IconSize.DIALOG)
 
         if status in [TarrabmeController.RESULT_SUCCESS,
                       TarrabmeController.RESULT_DISABLED_ERROR,

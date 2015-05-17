@@ -324,13 +324,13 @@ class RecentAttemptsController(GObject.GObject):
         labig_map = {TarrabmeController.RESULT_SUCCESS: ('SUCCESS: {code}',
                                                          'emblem-default'),
                      TarrabmeController.RESULT_NOT_FOUND_ERROR: ('CODE NOT FOUND: {code}',
-                                                                 'gtk-dialog-error'),
+                                                                 'dialog-error'),
                      TarrabmeController.RESULT_ALREADY_USED_ERROR: ('ALREADY USED CODE: {code}',
-                                                                    'gtk-dialog-error'),
+                                                                    'dialog-error'),
                      TarrabmeController.RESULT_DISABLED_ERROR: ('DISABLED CODE: {code}',
-                                                                'gtk-dialog-error'),
+                                                                'dialog-error'),
                      TarrabmeController.RESULT_UNKNOWN_ERROR: ('UNKNOWN ERROR: {code}',
-                                                               'gtk-dialog-error')}
+                                                               'dialog-error')}
 
         try:
             data = self.stack[0]
