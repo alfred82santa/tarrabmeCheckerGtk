@@ -260,15 +260,15 @@ class CameraSensor(BaseSensor):
     def active(self, value=True):
         super(CameraSensor, self).active(value)
         if not value:
-            self.reset_timeout_handler()
-            self.pipe.set_state(Gst.State.NULL)
+            self.stop()
         else:
             self.restart()
 
     def stop(self):
         self.reset_timeout_handler()
-        self.pipe.set_state(Gst.State.NULL)
-        self.pipe.get_state(Gst.CLOCK_TIME_NONE)
+        if self.pipe.get_state(Gst.CLOCK_TIME_NONE) != Gst.State.NULL:
+            self.pipe.set_state(Gst.State.NULL)
+            self.pipe.get_state(Gst.CLOCK_TIME_NONE)
 
     def __del__(self):
         self.stop()

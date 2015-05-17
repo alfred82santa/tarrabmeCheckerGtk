@@ -12,12 +12,17 @@ def get_utcdatetime_from_iso8601(date_str):
 
 
 def get_timedelta_text(base_date, item_date):
-    t_delta = base_date - item_date
-    tz = timezone(timedelta(seconds=-time.timezone))
+    t_delta = base_date.replace(microsecond=0) - item_date.replace(microsecond=0)
+    tz = timezone(timedelta(seconds=time.localtime().tm_gmtoff))
+    repr(t_delta)
+    repr(item_date)
+    repr(base_date)
     item_date = item_date.astimezone(tz)
 
-    if t_delta.days == 0:
-        if t_delta.seconds == 0:
+    if t_delta <= timedelta():
+        return "Just now"
+    elif t_delta.days == 0:
+        if t_delta.seconds <= 0:
             return "Just now"
         minutes = int(t_delta.seconds / 60)
         if minutes == 0:
@@ -40,5 +45,5 @@ def get_datetime_label(value):
     dt = get_utcdatetime_from_iso8601(value)
     txt = get_timedelta_text(datetime.utcnow().replace(tzinfo=timezone.utc),
                              dt)
-    tz = timezone(timedelta(seconds=-time.timezone))
+    tz = timezone(timedelta(seconds=time.localtime().tm_gmtoff))
     return "\n".join([txt, dt.astimezone(tz).strftime('%Y-%m-%d %H:%M:%S')])
